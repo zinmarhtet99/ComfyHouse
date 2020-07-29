@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Comfy House</title>
+	<!-- favicon -->
+	<link rel="icon" type="image/png" sizes="16x16" href="images/coverhouse.png">
+
+	<link rel="stylesheet" type="text/css" href="font.css">
+
+	<link rel="stylesheet" type="text/css" href="style.css">
+
+	<!-- Icon -->
+	<link rel="stylesheet" type="text/css" href="icon/fontawesome/css/all.min.css">
+
+	<!-- Iconfont -->
+	<link rel="stylesheet" type="text/css" href="icon/icofont/icofont.min.css">
+
+	<!-- boxicons-master -->
+	<link rel="stylesheet" type="text/css" href="icon/boxicons-master/css/boxicons.min.css">
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function  () {
+			$('#myform').hide();
+			$('#producttitle').hide();
+			$('#products').hide();
+			$('#shopnow').click(function  () {
+				$('#producttitle').show();
+				$('#products').show();
+			})				
+   			
+   			var count=0;
+   			$('.img-btn').click(function  () {
+   				count++;
+   				$('#qty').text(count);
+
+   				var id=$(this).data('id');
+				var name=$(this).data('name');
+				var photo=$(this).data('photo');
+				var price=$(this).data('price');
+
+				alert(`id =${id} , name= ${name},photo=${photo} , price = ${price}`);
+
+				var item={id:id,name:name,photo:photo,price:price,qty:1};
+				//object 
+
+				var itemArr;
+				var loItem=localStorage.getItem('items');
+				//string
+
+				if(loItem==null){
+					//object array
+					itemArr= Array();
+				}else{
+					itemArr=JSON.parse(loItem);
+				}
+
+				var qty=0;
+				var exist;
+				$.each(itemArr,function  (i,v) {
+					if(id==v.id){
+					qty=v.qty++;
+						exist=1;
+					}
+				})
+				
+				if(!exist){
+					itemArr.push(item);
+				}
+				localStorage.setItem('items',JSON.stringify(itemArr));
+   			})
+
+   			$('#tbody').on('change','.qty',function  () {
+				var id=$(this).data('id');
+				var qty=$(this).val();
+
+				var loItem=localStorage.getItem('items');
+
+				var itemArr=JSON.parse(loItem);
+
+				if(qty<itemArr[id].qty){
+					count--;
+				}else if(qty>itemArr[id].qty){
+					count++;
+				}
+				$('#qty').text(count);
+				
+				itemArr[id].qty=qty;
+
+				if(qty==0){
+					itemArr.splice(id,1);
+				}
+
+				localStorage.setItem('items', JSON.stringify(itemArr));
+				getData();
+			})
+
+			$('#tbody').on('click','.remove',function  () {
+
+				alert('ok');
+				count--;
+				$('#qty').text(count);
+				//no
+				var id=$(this).data('id');
+
+				var loItem=localStorage.getItem('items');
+
+				var itemArr=JSON.parse(loItem);
+
+				//delete
+				// if(id){
+					itemArr.splice(id,1);
+				// }
+				
+
+				localStorage.setItem('items', JSON.stringify(itemArr));
+
+				getData();
+
+			})
+
+   			//get data
+   			function getData () {
+   				var loItem=localStorage.getItem('items');
+   				var html="";
+   				var total=0;
+
+
+   				if(loItem != null){
+   					itemArr= JSON.parse(loItem);
+   					$.each(itemArr,function  (i,v) {
+   						var subtotal= v.qty * v.price;
+   						total+=subtotal;
+   						html+= `<tr> <td rowspan="3"><img src="${v.photo}" width="200" height = "200"></td>
+   						<td>${v.name}</td>
+   						<td rowspan="3"><input type="number" style="line-height:30px;" value="${v.qty}" class="qty" data-id="${i}"></td>
+   						</tr>
+   						<tr>
+   						<td>${v.price}</td>
+   						</tr>
+   						<tr> <td><button class="remove" data-id="${i}">remove</button></td>
+   						</tr>`;
+   					})
+   					html+=`<tr> <td colspan ="3">
+   					<center> Total : ${total}</center> 
+   					</td>
+   					</tr>
+   					<tr>
+   					<td colspan="3">
+   					<center>
+	   					<button class="clearcart">
+	   						CLEAR CART
+	   					</button>
+	   				</center>
+   					</td>
+   					</tr>
+   					`;
+   					$('#tbody').html(html);
+
+   				}else {
+
+   				}
+   			}
+
+   			$('#icon').click(function  () {
+   				$('#myform').show();
+   				getData();
+   			})
+
+   			
+   			$('#tbody').on('click','.clearcart',function  () { 
+   				localStorage.clear();
+   				$('#myform').reset();
+   				getData().remove();
+   				$('#qty').text(count)--;
+   			})
+
+		})
+	</script>
+</head>
+<body>
+	<div id="nav">
+		<div class="nav_left">
+			<i class="icofont-navigation-menu"></i>
+		</div>
+		<div class="nav_middle">
+			<h1>Comfy House</h1>
+		</div>
+		<div class="nav_right">
+			<i class="icofont-shopping-cart" id="icon"></i>
+			<span id="qty"><sup>0</sup></span>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div id="banner">
+		 <img src="images/coverhouse.png">
+		 <div class="quote">
+			<h2>FURNITURE COLLECTION</h2>
+			<br>
+			<button id="shopnow">SHOP NOW</button>
+		 </div>
+	</div>
+	<div id="producttitle">
+		<h1>Our Products</h1>
+	</div>
+	<div id="products">
+		<div class="img-wrapper">
+  			<img ID="UserImage" class="imageUser" src="images/bed.jpg"/>
+  			<button ID="ButtonChange" class="img-btn" data-id="1"  data-photo="images/bed.jpg" data-name="Bed 1" data-price="10"><i class="icofont-shopping-cart"></i>AD To Cart</button>
+  			<h3>Queen Bed</h3>
+			<p>$ 10</p>
+		</div>
+		<div class="img-wrapper">
+  			<img ID="UserImage" class="imageUser" src="images/bed1.jpg" />
+  			<button ID="ButtonChange" class="img-btn" data-id="2" data-name="Bed 2" data-photo="images/bed1.jpg" data-price="16"><i class="icofont-shopping-cart"></i>AD To Cart </button>
+			<h3>Queen Bed</h3>
+			<p>$ 16</p>
+		</div>
+		<div class="img-wrapper">
+  			<img ID="UserImage" class="imageUser" src="images/bed2.webp" />
+  			<button ID="ButtonChange" class="img-btn" data-id="3" data-name="Bed 3" data-photo="images/bed2.webp" data-price="10"><i class="icofont-shopping-cart"></i>AD To Cart </button>
+			<h3>Queen Bed</h3>
+			<p>$ 10</p>
+		</div>
+		<div class="img-wrapper">
+  			<img ID="UserImage" class="imageUser" src="images/bed3.webp" />
+  			<button ID="ButtonChange" class="img-btn" data-id="4" data-name="Bed 4" data-photo="images/bed3.webp" data-price="10"><i class="icofont-shopping-cart"></i>AD To Cart </button>
+			<h3>Queen Bed</h3>
+			<p>$ 10</p>
+		</div>
+		<div class="img-wrapper">
+  			<img ID="UserImage" class="imageUser" src="images/bed4.jfif" />
+  			<button ID="ButtonChange" class="img-btn" data-id="5" data-name="Bed 5" data-photo="images/bed4.jfif" data-price="10"><i class="icofont-shopping-cart"></i>AD To Cart </button>
+			<h3>Queen Bed</h3>
+			<p>$ 10</p>
+		</div>
+		<div class="img-wrapper">
+  			<img ID="UserImage" class="imageUser" src="images/bed5.jfif" />
+  			<button ID="ButtonChange" class="img-btn" data-id="6" data-name="Bed 6" data-photo="images/bed5.jfif" data-price="10"><i class="icofont-shopping-cart"></i>AD To Cart </button>
+			<h3>Queen Bed</h3>
+			<p>$ 10</p>
+		</div>
+		<div class="img-wrapper">
+  			<img ID="UserImage" class="imageUser" src="images/bed6.jfif" />
+  			<button ID="ButtonChange" class="img-btn" data-id="7" data-name="Bed 7" data-photo="images/bed6.jfif" data-price="10"><i class="icofont-shopping-cart"></i>AD To Cart </button>
+			<h3>Queen Bed</h3>
+			<p>$ 10</p>
+		</div>
+		<div class="img-wrapper">
+  			<img ID="UserImage" class="imageUser" src="images/bed7.jfif" />
+  			<button ID="ButtonChange" class="img-btn" data-id="8" data-name="Bed 8" data-photo="images/bed7.jfif" data-price="10"><i class="icofont-shopping-cart"></i>AD To Cart </button>
+			<h3>Queen Bed</h3>
+			<p>$ 10</p>
+		</div>
+		<div class="img-wrapper">
+  			<img ID="UserImage" class="imageUser" src="images/bed8.jfif" />
+  			<button ID="ButtonChange" class="img-btn" data-id="9" data-name="Bed 9" data-photo="images/bed8.jfif" data-price="10"><i class="icofont-shopping-cart"></i>AD To Cart </button>
+			<h3>Queen Bed</h3>
+			<p>$ 10</p>
+		</div>
+	</div>	
+	<form id="myform">
+		<h1 style="text-align: center;">Your Cart</h1>
+		<table cellpadding="10" cellspacing="0" id="mytable">
+		<tbody id="tbody">
+			
+		</tbody>
+	</table>
+	</form>
+</body>
+</html>
